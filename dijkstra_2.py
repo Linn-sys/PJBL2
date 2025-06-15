@@ -15,53 +15,57 @@ import networkx as nx  # Importa a biblioteca networkx para manipulação de gra
 import matplotlib.pyplot as plt  # Importa o matplotlib para visualização de grafos.
 
 def dijkstra(ini, fin, grafo):  # Grafo como MA.
+#Checa se a cidade de destino é a mesma do começo, se sim caminho zero
     if ini == fin:
       vazio = []
+      print("Somente Vértice Inicial no caminho.")
       return vazio, 0
-
+#Inicializa as variáveis e listas
     n = len(grafo)
     resolvido = [False] * n
     resolvido[ini] = True
     distancia = [sys.maxsize] * n
     distancia[ini] = 0
     anterior = [-1] * n
-
+#enquanto o vértice de destino não for resolvido
     while not resolvido[fin]:
-        menorDistancia = sys.maxsize
-        proximo = -1
+        menorDistancia = sys.maxsize #atribue um valor infinito para a menor distância
+        proximo = -1 #indefine o próximo
         for i in range(n):
             if resolvido[i]:  # Só considera vértices já resolvidos
                 for j in range(n):
-                    peso = grafo[i][j]
-                    if peso > 0 and not resolvido[j]:
-                        novaDistancia = distancia[i] + peso
-                        if novaDistancia < distancia[j]:
+                    peso = grafo[i][j] #Armazena o peso de cada aresta
+                    if peso > 0 and not resolvido[j]: #Checa se o vértice j é adjacente e não resolvido
+                        novaDistancia = distancia[i] + peso #Calcula a nova distância com o peso e a distância do vértice resolvido i
+                        if novaDistancia < distancia[j]: #Se a nova distancia é menor que a distância armazenada atual, sobrescreve com a nova menor distância
                             distancia[j] = novaDistancia
-                            anterior[j] = i
-        # Escolhe o próximo vértice com menor distância não resolvido
-        for j in range(n):
-            if not resolvido[j] and distancia[j] < menorDistancia:
-                menorDistancia = distancia[j]
-                proximo = j
+                            anterior[j] = i #Guarda de qual vértice resolvido veio
+                        #Escolhe o próximo vértice com menor distância não resolvido
+                        if not resolvido[j] and distancia[j] < menorDistancia:
+                            menorDistancia = distancia[j]
+                            proximo = j #armazena o índice
+        if proximo == -1: #se próximo continua indefinido então caminho inexistente
+            inexistente = []
+            inexistente.append(sys.maxsize)
+            print("Caminho Inexistente.")
+            return inexistente, sys.maxsize
 
-        if proximo == -1:
-            vazio = []
-            return vazio, 0
-
-        resolvido[proximo] = True
+        resolvido[proximo] = True #resolve o vértice com menor caminho detectado
 
     # Reconstrução do caminho
-    caminho = []
-    verticeAtual = fin
-    while verticeAtual != ini:
-        caminho.insert(0, verticeAtual)
-        verticeAtual = anterior[verticeAtual]
-        if verticeAtual == -1:
+    caminho = [] #cria uma lista vazia
+    verticeAtual = fin #define
+    while verticeAtual != ini: #enquanto não for o vértice inicial
+        caminho.insert(0, verticeAtual) #insere
+        verticeAtual = anterior[verticeAtual] #atualiza com o anterior
+        if verticeAtual == -1: #Se o anterior for -1, não há caminho
             inexistente = []
+            inexistente.append(sys.maxsize)
+            print("Caminho Inexistente.")
             return inexistente, sys.maxsize
-    caminho.insert(0, ini)
+    caminho.insert(0, ini) #insere o vértice inicial no início do caminho
 
-    return caminho, distancia[fin]
+    return caminho, distancia[fin] #retorna a lista do caminho e distância
 
 
 # Função para plotar os grafos original e resultante de Dijkstra.
